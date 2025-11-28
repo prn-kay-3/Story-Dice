@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Dice Generator</title>
+    <style>
+        :root {
+            --bg-dark: #131313;
+            --text-light: #E0E0E0;
+            --text-white: #FFFFFF;
+            --primary-accent: #fef734;
+            --secondary-accent: #de86fe;
+            --dice-size: 120px;
+            --dice-size-mobile: 90px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--text-white);
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* Control Section */
+        .controls-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            color: var(--text-white);
+            font-size: 1.1rem;
+        }
+
+        input[type="number"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--primary-accent);
+            color: var(--text-white);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            width: 100px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--secondary-accent);
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-accent), #e6de2f);
+            color: var(--bg-dark);
+            border: none;
+            padding: 14px 32px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 48px;
+            min-height: 48px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(254, 247, 52, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Dice Display Section */
+        .dice-section {
+            margin-bottom: 40px;
+        }
+
+        .dice-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dice {
+            width: var(--dice-size);
+            height: var(--dice-size);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            animation: rollIn 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes rollIn {
+            0% {
+                transform: rotate(0deg) scale(0);
+            }
+            50% {
+                transform: rotate(180deg) scale(1.1);
+            }
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
+
+        .dice:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .dice img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        /* Player Scoring Section */
+        .players-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .players-section h2 {
+            color: var(--secondary-accent);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .add-player-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .add-player-form input[type="text"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--secondary-accent);
+            color: var(--text-white);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .add-player-form input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .add-player-form button {
+            background: linear-gradient(135deg, var(--secondary-accent), #c96deb);
+        }
+
+        .add-player-form button:hover {
+            box-shadow: 0 6px 20px rgba(222, 134, 254, 0.4);
+        }
+
+        .players-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .player-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid var(--secondary-accent);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(222, 134, 254, 0.3);
+        }
+
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .player-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-white);
+        }
+
+        .remove-player {
+            background: #ff4444;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            min-width: 32px;
+            min-height: 32px;
+            padding: 0;
+        }
+
+        .remove-player:hover {
+            background: #cc0000;
+            transform: rotate(90deg);
+        }
+
+        .player-score {
+            font-size: 2rem;
+            color: var(--primary-accent);
+            text-align: center;
+            margin: 15px 0;
+            font-weight: 700;
+        }
+
+        .score-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .score-btn {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            min-width: 48px;
+            min-height: 48px;
+            font-weight: 700;
+        }
+
+        .score-btn.minus {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+        }
+
+        .score-btn.plus {
+            background: linear-gradient(135deg, #51cf66, #37b24d);
+        }
+
+        .score-btn.minus:hover {
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .score-btn.plus:hover {
+            box-shadow: 0 6px 20px rgba(81, 207, 102, 0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .dice-container {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+
+            .dice {
+                width: var(--dice-size-mobile);
+                height: var(--dice-size-mobile);
+            }
+
+            .controls-section,
+            .players-section {
+                padding: 20px;
+            }
+
+            .control-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            input[type="number"] {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .players-list {
+                grid-template-columns: 1fr;
+            }
+
+            .add-player-form {
+                flex-direction: column;
+            }
+
+            .add-player-form input[type="text"] {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .dice {
+                width: 80px;
+                height: 80px;
+            }
+
+            .dice-container {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>🎲 Story Dice Generator</h1>
+        <p class="subtitle">Roll the dice and let your imagination create amazing stories!</p>
+
+        <!-- Dice Controls -->
+        <section class="controls-section">
+            <div class="control-group">
+                <label for="diceCount">Number of Dice:</label>
+                <input type="number" id="diceCount" min="1" max="30" value="5">
+                <button id="generateBtn">Roll Dice</button>
+            </div>
+        </section>
+
+        <!-- Dice Display -->
+        <section class="dice-section">
+            <div class="dice-container" id="diceContainer"></div>
+        </section>
+
+        <!-- Player Scoring -->
+        <section class="players-section">
+            <h2>Player Scores</h2>
+            <div class="add-player-form">
+                <input type="text" id="playerName" placeholder="Enter player name..." maxlength="20">
+                <button id="addPlayerBtn">Add Player</button>
+            </div>
+            <div class="players-list" id="playersList">
+                <div class="empty-state">No players yet. Add a player to start tracking scores!</div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Dice colors (12 preset colors)
+        const diceColors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A',
+            '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
+            '#F8B500', '#52D681', '#FF8ED4', '#A8E6CF'
+        ];
+
+        // Story dice icons (sample set - replace with your actual icon filenames)
+        const diceIcons = [
+            'apple', 'tree', 'house', 'car', 'boat', 'airplane',
+            'star', 'moon', 'sun', 'cloud', 'rainbow', 'heart',
+            'book', 'key', 'crown', 'sword', 'shield', 'castle',
+            'dragon', 'wizard', 'treasure', 'map', 'compass', 'telescope'
+        ];
+
+        // Players data
+        let players = [];
+
+        // DOM Elements
+        const diceCountInput = document.getElementById('diceCount');
+        const generateBtn = document.getElementById('generateBtn');
+        const diceContainer = document.getElementById('diceContainer');
+        const playerNameInput = document.getElementById('playerName');
+        const addPlayerBtn = document.getElementById('addPlayerBtn');
+        const playersList = document.getElementById('playersList');
+
+        // Generate random dice
+        function generateDice() {
+            const count = parseInt(diceCountInput.value) || 5;
+            diceContainer.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                const dice = document.createElement('div');
+                dice.className = 'dice';
+                
+                // Random color from preset colors
+                const randomColor = diceColors[Math.floor(Math.random() * diceColors.length)];
+                dice.style.backgroundColor = randomColor;
+                
+                // Random icon
+                const randomIcon = diceIcons[Math.floor(Math.random() * diceIcons.length)];
+                
+                // Create image element
+                const img = document.createElement('img');
+                // Note: Update this path to match your actual Dice Images folder structure
+                img.src = `Dice Images/${randomIcon}.png`;
+                img.alt = randomIcon;
+                img.onerror = function() {
+                    // Fallback if image doesn't exist - show emoji
+                    this.style.display = 'none';
+                    dice.innerHTML = '<div style="font-size: 3rem;">🎲</div>';
+                };
+                
+                dice.appendChild(img);
+                diceContainer.appendChild(dice);
+
+                // Stagger animation
+                dice.style.animationDelay = `${i * 0.1}s`;
+            }
+        }
+
+        // Add player
+        function addPlayer() {
+            const name = playerNameInput.value.trim();
+            if (!name) {
+                alert('Please enter a player name');
+                return;
+            }
+
+            const player = {
+                id: Date.now(),
+                name: name,
+                score: 0
+            };
+
+            players.push(player);
+            playerNameInput.value = '';
+            renderPlayers();
+        }
+
+        // Remove player
+        function removePlayer(id) {
+            players = players.filter(p => p.id !== id);
+            renderPlayers();
+        }
+
+        // Update score
+        function updateScore(id, change) {
+            const player = players.find(p => p.id === id);
+            if (player) {
+                player.score += change;
+                renderPlayers();
+            }
+        }
+
+        // Render players list
+        function renderPlayers() {
+            if (players.length === 0) {
+                playersList.innerHTML = '<div class="empty-state">No players yet. Add a player to start tracking scores!</div>';
+                return;
+            }
+
+            playersList.innerHTML = players.map(player => `
+                <div class="player-card">
+                    <div class="player-header">
+                        <div class="player-name">${player.name}</div>
+                        <button class="remove-player" onclick="removePlayer(${player.id})">×</button>
+                    </div>
+                    <div class="player-score">${player.score}</div>
+                    <div class="score-controls">
+                        <button class="score-btn minus" onclick="updateScore(${player.id}, -1)">-</button>
+                        <button class="score-btn plus" onclick="updateScore(${player.id}, 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Event listeners
+        generateBtn.addEventListener('click', generateDice);
+        addPlayerBtn.addEventListener('click', addPlayer);
+        
+        playerNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addPlayer();
+            }
+        });
+
+        diceCountInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateDice();
+            }
+        });
+
+        // Generate initial dice on load
+        generateDice();
+    </script>
+</body>
+</html>
